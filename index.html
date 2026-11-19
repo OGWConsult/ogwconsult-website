@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OGW Consult HR System</title>
+<meta name="description" content="HR software for companies whose people don't sit at desks: leave, contracts, disciplinary records, compliance reports and paper timesheets in one system set up for your company.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Source+Sans+3:wght@400;600;700&family=Caveat:wght@500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Layout idea: a field-office clipboard. Paper-grey ground, ink text, hi-vis highlighter as the one loud colour. */
+  --paper:#ECEEEA;
+  --sheet:#FBFBF8;
+  --ink:#16231F;
+  --ink-soft:#4C5A55;
+  --rule:#C9D0CB;
+  --deep:#1E5A4E;
+  --hivis:#F4C82E;
+  --display:"Archivo","Arial Narrow",Arial,sans-serif;
+  --body:"Source Sans 3","Segoe UI",Arial,sans-serif;
+  --hand:"Caveat","Comic Sans MS",cursive;
+  --mono:"IBM Plex Mono",Consolas,monospace;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.55}
+a{color:inherit}
+img{max-width:100%}
+.wrap{max-width:1160px;margin:0 auto;padding:0 24px}
+h1,h2,h3{font-family:var(--display);font-stretch:72%;line-height:1.02;margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:clamp(46px,7.2vw,92px);font-weight:850;text-transform:uppercase}
+h2{font-size:clamp(34px,4.6vw,56px);font-weight:800;text-transform:uppercase}
+h3{font-size:24px;font-weight:750;font-stretch:85%}
+p{margin:0}
+.mark{background:linear-gradient(transparent 52%,var(--hivis) 52%,var(--hivis) 92%,transparent 92%);padding:0 .08em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.band .mark{background:var(--hivis);color:var(--ink)}
+.eyebrow{font-family:var(--mono);font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
+:focus-visible{outline:3px solid var(--deep);outline-offset:3px}
+
+/* nav */
+nav{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--paper) 92%,transparent);backdrop-filter:blur(6px);border-bottom:1px solid var(--rule)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;height:64px}
+.logo{white-space:nowrap;font-family:var(--display);font-stretch:75%;font-weight:900;font-size:24px;letter-spacing:.02em;text-decoration:none;display:flex;align-items:center;gap:10px}
+.logo i{display:inline-grid;place-items:center;width:30px;height:30px;background:var(--ink);color:var(--hivis);font-style:normal;font-size:15px;border-radius:4px}
+nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0;font-weight:600;font-size:16px}
+nav ul a{text-decoration:none}
+nav ul a:hover{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px}
+.btn{white-space:nowrap;display:inline-flex;align-items:center;gap:8px;font-family:var(--body);font-weight:700;font-size:17px;text-decoration:none;padding:13px 22px;border-radius:6px;border:2px solid var(--ink);background:var(--ink);color:var(--sheet);cursor:pointer;transition:transform .15s,box-shadow .15s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 4px 0 var(--hivis)}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn.small{padding:9px 16px;font-size:15px}
+
+/* hero */
+.hero{padding:64px 0 72px;overflow:hidden}
+.hero .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
+.hero .lede{font-size:21px;color:var(--ink-soft);max-width:34em;margin:26px 0 32px}
+.hero .ctas{display:flex;flex-wrap:wrap;gap:14px}
+.proof{margin-top:34px;display:flex;gap:12px;align-items:flex-start;font-size:15px;color:var(--ink-soft);max-width:34em}
+.proof b{color:var(--ink)}
+.dot{flex:none;width:10px;height:10px;border-radius:50%;background:#2E9E6B;margin-top:7px;box-shadow:0 0 0 4px #2e9e6b33}
+
+/* the clipboard demo */
+.demo{position:relative;min-height:470px}
+.timesheet{position:relative;background:var(--sheet);border:1px solid var(--rule);border-radius:4px;padding:22px 22px 18px;box-shadow:0 1px 0 var(--rule),0 18px 40px -22px #16231f55;transform:rotate(-2.2deg);width:88%;overflow:hidden}
+.timesheet:before{content:"";position:absolute;top:-1px;left:50%;width:120px;height:22px;transform:translateX(-50%);background:#9AA39E;border-radius:0 0 8px 8px}
+.ts-head{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);margin:12px 0 8px}
+.ts-table{width:100%;border-collapse:collapse;font-size:13px}
+.ts-table th{font-family:var(--mono);font-weight:500;font-size:10.5px;text-transform:uppercase;color:var(--ink-soft);text-align:left;border-bottom:1.5px solid var(--ink);padding:4px 6px}
+.ts-table td{border-bottom:1px solid var(--rule);padding:3px 6px;font-family:var(--hand);font-size:22px;line-height:1.15;color:#22408A}
+.ts-sign{display:flex;justify-content:space-between;margin-top:12px;font-family:var(--mono);font-size:10.5px;color:var(--ink-soft)}
+.ts-sign span{font-family:var(--hand);font-size:24px;color:#22408A;margin-left:6px}
+.scan{position:absolute;left:0;right:0;height:42px;top:0;background:linear-gradient(transparent,#f4c82e66 60%,var(--hivis) 62%,transparent 66%);opacity:0;pointer-events:none;animation:scan 3.2s ease-in-out .6s 1 both}
+@keyframes scan{0%{top:30px;opacity:0}10%{opacity:1}90%{opacity:1}100%{top:calc(100% - 50px);opacity:0}}
+.record{position:absolute;right:0;bottom:0;width:62%;background:var(--ink);color:var(--sheet);border-radius:8px;padding:18px 20px;box-shadow:0 24px 50px -20px #16231f99;font-size:14px}
+.record .eyebrow{color:#9FB5AE;margin-bottom:10px;display:flex;justify-content:space-between}
+.rrow{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid #ffffff1f;font-family:var(--mono);font-size:13px;animation:fill .5s ease both}
+.rrow b{font-weight:500;color:var(--hivis)}
+.rrow:nth-child(2){animation-delay:1.2s}.rrow:nth-child(3){animation-delay:1.7s}.rrow:nth-child(4){animation-delay:2.2s}.rrow:nth-child(5){animation-delay:2.7s}
+@keyframes fill{from{background:#f4c82e40}to{background:transparent}}
+.status{margin-top:12px;display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;background:#ffffff14;padding:6px 10px;border-radius:999px}
+.status:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--hivis)}
+.arrow{position:absolute;left:34%;bottom:150px;font-family:var(--hand);font-size:26px;color:var(--deep);transform:rotate(-6deg)}
+
+/* sections */
+section{padding:88px 0}
+.band{background:var(--ink);color:var(--sheet)}
+.band .eyebrow{color:#9FB5AE}
+.problem .wrap{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:end}
+.problem p{font-size:20px;color:#C9D6D1}
+.problem p+p{margin-top:16px}
+.problem .mark{color:var(--ink)}
+
+.sec-head{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:end;margin-bottom:48px}
+.sec-head p{font-size:19px;color:var(--ink-soft);max-width:30em}
+.features{display:grid;grid-template-columns:repeat(4,1fr);border-top:2px solid var(--ink)}
+.feature{padding:26px 22px 30px 0;border-bottom:1px solid var(--rule)}
+.feature:not(:nth-child(4n+1)){padding-left:22px;border-left:1px solid var(--rule)}
+.feature .num{font-family:var(--mono);font-size:12px;color:var(--ink-soft)}
+.feature h3{margin:10px 0 10px}
+.feature p{font-size:16px;color:var(--ink-soft)}
+.feature.star{background:var(--sheet)}
+.feature.star h3 .mark{padding:0 .1em}
+
+.custom .wrap{display:grid;grid-template-columns:.9fr 1.1fr;gap:56px;align-items:start}
+.custom-list{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.chip{background:var(--sheet);border:1px solid var(--rule);border-left:5px solid var(--deep);padding:14px 16px;border-radius:4px}
+.chip b{display:block;font-size:17px}
+.chip span{font-size:15px;color:var(--ink-soft)}
+.custom .note{margin-top:22px;font-size:17px;color:var(--ink-soft)}
+
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;counter-reset:s}
+.step{border-top:6px solid var(--hivis);padding-top:18px}
+.step .eyebrow{color:#9FB5AE}
+.step h3{margin:8px 0 8px;color:var(--sheet)}
+.step p{font-size:16px;color:#C9D6D1}
+
+/* pricing */
+.toggle{display:inline-flex;border:2px solid var(--ink);border-radius:999px;padding:3px;gap:3px;margin-top:22px}
+.toggle button{font:600 15px var(--body);border:0;background:transparent;color:var(--ink);padding:8px 16px;border-radius:999px;cursor:pointer}
+.toggle button[aria-pressed="true"]{background:var(--ink);color:var(--sheet)}
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.plan{background:var(--sheet);border:1px solid var(--rule);border-radius:8px;padding:28px 26px;display:flex;flex-direction:column;gap:14px}
+.plan.pick{border:2px solid var(--ink);box-shadow:8px 8px 0 var(--hivis)}
+.plan .who{font-family:var(--mono);font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft)}
+.price{font-family:var(--display);font-stretch:75%;font-weight:850;font-size:54px;line-height:1;font-variant-numeric:tabular-nums}
+.price small{font-family:var(--body);font-size:16px;font-weight:600;color:var(--ink-soft);letter-spacing:0}
+.plan ul{margin:0;padding:0;list-style:none;display:grid;gap:8px;font-size:16px}
+.plan li{padding-left:24px;position:relative}
+.plan li:before{content:"";position:absolute;left:2px;top:9px;width:11px;height:6px;border-left:2.5px solid var(--deep);border-bottom:2.5px solid var(--deep);transform:rotate(-45deg)}
+.plan .btn{margin-top:auto;justify-content:center}
+.setup{margin-top:22px;display:flex;flex-wrap:wrap;gap:12px 28px;align-items:center;justify-content:space-between;border:1.5px dashed var(--ink-soft);border-radius:8px;padding:18px 24px;font-size:17px}
+.setup b{font-variant-numeric:tabular-nums}
+
+/* faq */
+.faq{display:grid;grid-template-columns:repeat(2,1fr);gap:0 48px;border-top:2px solid var(--ink)}
+details{border-bottom:1px solid var(--rule);padding:18px 0}
+summary{cursor:pointer;font-weight:700;font-size:19px;list-style:none;display:flex;justify-content:space-between;gap:16px}
+summary::-webkit-details-marker{display:none}
+summary:after{content:"+";font-family:var(--mono);font-size:22px;line-height:1}
+details[open] summary:after{content:"–"}
+details p{margin-top:10px;color:var(--ink-soft);font-size:17px}
+
+/* contact */
+.contact .wrap{display:grid;grid-template-columns:1fr 1fr;gap:56px}
+.contact p.big{font-size:20px;color:#C9D6D1;margin:20px 0 26px}
+.direct{display:grid;gap:10px;font-size:17px}
+.direct a{color:var(--hivis)}
+form{background:var(--sheet);color:var(--ink);border-radius:8px;padding:28px;display:grid;gap:14px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+label{font-size:14px;font-weight:700;display:grid;gap:6px}
+input,select{font:16px var(--body);padding:11px 12px;border:1.5px solid var(--rule);border-radius:6px;background:#fff;color:var(--ink);width:100%}
+input:focus,select:focus{border-color:var(--deep);outline:none;box-shadow:0 0 0 3px #1e5a4e33}
+.formnote{font-size:14px;color:var(--ink-soft)}
+.formnote[data-state="done"]{color:var(--deep);font-weight:700}
+footer{padding:28px 0;font-size:14px;color:var(--ink-soft)}
+footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
+
+@media (max-width:960px){
+  .hero .wrap,.problem .wrap,.sec-head,.custom .wrap,.contact .wrap{grid-template-columns:1fr;gap:32px}
+  .features{grid-template-columns:repeat(2,1fr)}
+  .feature,.feature:not(:nth-child(4n+1)){padding:22px 18px 26px 0;border-left:0}
+  .feature:nth-child(2n){padding-left:18px;border-left:1px solid var(--rule)}
+  .steps{grid-template-columns:repeat(2,1fr)}
+  .plans{grid-template-columns:1fr}
+  .demo{min-height:440px;max-width:560px}
+}
+@media (max-width:640px){
+  body{font-size:17px}
+  nav ul{display:none}
+  section{padding:64px 0}
+  .features,.steps,.faq,.custom-list,.two{grid-template-columns:1fr}
+  .feature:nth-child(2n){padding-left:0;border-left:0}
+  h1{font-size:40px}
+  .logo{font-size:19px}
+  .timesheet{width:100%;padding:18px 12px 14px}
+  .ts-table td{font-size:17px;padding:3px 4px}
+  .ts-table th{padding:4px}
+  .demo{min-height:400px}
+  .record{width:88%;padding:14px 16px}
+  .hero .lede{font-size:19px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<nav aria-label="Main">
+  <div class="wrap">
+    <a class="logo" href="#top"><i>OG</i>OGW CONSULT</a>
+    <ul>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#custom">Customise</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+    <a class="btn small" href="#demo">Book a demo</a>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div>
+      <p class="eyebrow">HR management system</p>
+      <h1 style="margin-top:14px">HR for people who <span class="mark">don't sit at desks.</span></h1>
+      <p class="lede">Leave, contracts, disciplinary records, compliance reports and paper timesheets in one system, set up around how your company already works. Your workers keep their pen and paper. Your HR team stops retyping it.</p>
+      <div class="ctas">
+        <a class="btn" href="#demo">Book a 30-minute demo</a>
+        <a class="btn ghost" href="#pricing">See pricing</a>
+      </div>
+      <div class="proof"><span class="dot" aria-hidden="true"></span><p><b>Already live</b> at a multi-depot waste management and engineering group, and an oil and gas services company.</p></div>
+    </div>
+
+    <div class="demo" aria-label="Example: a signed paper timesheet turned into a draft digital record">
+      <div class="timesheet">
+        <div class="scan" aria-hidden="true"></div>
+        <div class="ts-head"><span>Weekly timesheet · Depot 3</span><span>Wk 47</span></div>
+        <table class="ts-table">
+          <thead><tr><th>Emp no.</th><th>Name</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th></tr></thead>
+          <tbody>
+            <tr><td>WO214</td><td>J. Amutenya</td><td>9</td><td>9</td><td>10</td><td>9</td><td>8</td></tr>
+            <tr><td>WO231</td><td>P. Shikongo</td><td>9</td><td>S</td><td>S</td><td>9</td><td>9</td></tr>
+            <tr><td>ZWO418</td><td>M. Garises</td><td>9</td><td>9</td><td>9</td><td>11</td><td>8</td></tr>
+            <tr><td>WO305</td><td>K. Nangolo</td><td>L</td><td>L</td><td>L</td><td>L</td><td>L</td></tr>
+          </tbody>
+        </table>
+        <div class="ts-sign"><div>Employee:<span>JA</span></div><div>Supervisor:<span>D. Kloppers</span></div></div>
+      </div>
+      <div class="record">
+        <div class="eyebrow"><span>Draft record · WO231</span><span>Wk 47</span></div>
+        <div class="rrow"><span>Normal hours</span><b>27.0</b></div>
+        <div class="rrow"><span>Sick leave</span><b>2 days</b></div>
+        <div class="rrow"><span>Sick balance left</span><b>28 days</b></div>
+        <div class="rrow"><span>Supervisor signed</span><b>Yes</b></div>
+        <span class="status">Awaiting employee confirmation</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="band problem" aria-labelledby="p-h">
+  <div class="wrap">
+    <div>
+      <p class="eyebrow">The problem</p>
+      <h2 id="p-h" style="margin-top:14px">Paper on site. Spreadsheets in the office. One HR person in the middle.</h2>
+    </div>
+    <div>
+      <p>Most HR software assumes every employee has a phone, an email address and a login. On a depot, a mine site or a workshop floor, many don't. So the work lands on HR: leave forms in a drawer, contracts copied from last year's Word file, warnings filed who-knows-where, and timesheets retyped line by line.</p>
+      <p>This system was built inside exactly that kind of company. It keeps the paper your people trust and <span class="mark">takes the retyping off your desk.</span></p>
+    </div>
+  </div>
+</section>
+
+<section id="features" aria-labelledby="f-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><p class="eyebrow">What it does</p><h2 id="f-h" style="margin-top:14px">Everything HR touches, in one place.</h2></div>
+      <p>One login for your HR team. Every employee's full history, from appointment to exit, a click away.</p>
+    </div>
+    <div class="features">
+      <article class="feature star"><p class="num">01</p><h3><span class="mark">Paper timesheets, read by AI</span></h3><p>Scan the signed sheet. The system drafts the record, the employee checks a printout, and only a signed confirmation becomes final. Nothing reaches payroll unchecked.</p></article>
+      <article class="feature"><p class="num">02</p><h3>Employee records</h3><p>Every person, contract, site and company in one register, with your own employee numbering. Works across several companies in a group.</p></article>
+      <article class="feature"><p class="num">03</p><h3>Leave</h3><p>Annual, sick and other leave captured from paper forms, with balances that update themselves.</p></article>
+      <article class="feature"><p class="num">04</p><h3>Contracts</h3><p>Generate employment contracts from your own templates as Word files. Renewal reminders, with the new term matched to the last one.</p></article>
+      <article class="feature"><p class="num">05</p><h3>Discipline &amp; IR</h3><p>Counselling, warnings and hearing outcomes on each employee's file, so you can see the full history before you act.</p></article>
+      <article class="feature"><p class="num">06</p><h3>Compliance reports</h3><p>Employment equity / Affirmative Action reporting from data you already hold, instead of a week of spreadsheets.</p></article>
+      <article class="feature"><p class="num">07</p><h3>Training &amp; levy claims</h3><p>Track training and build the evidence for training-levy grant claims, so money you're owed doesn't go unclaimed.</p></article>
+      <article class="feature"><p class="num">08</p><h3>Dashboards</h3><p>Headcount, turnover, movement, contract renewals, leave and performance. Ready for your monthly management meeting.</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="custom" id="custom" aria-labelledby="c-h" style="padding-top:0">
+  <div class="wrap">
+    <div>
+      <p class="eyebrow">Customisable</p>
+      <h2 id="c-h" style="margin-top:14px">Set up around your company. Not the other way round.</h2>
+      <p class="note">You don't bend your processes to fit a generic tool. At set-up we configure the system to your rules, then train your team on it.</p>
+      <p class="note"><b>Your data stays yours.</b> Every client runs on its own separate system and database. Your records never share space with another company's.</p>
+    </div>
+    <div class="custom-list">
+      <div class="chip"><b>Your name and logo</b><span>Your team sees your company, not ours.</span></div>
+      <div class="chip"><b>Your contract templates</b><span>Your wording, your clauses, generated in seconds.</span></div>
+      <div class="chip"><b>Your leave rules</b><span>Leave types, accrual and cycles as your policy sets them.</span></div>
+      <div class="chip"><b>Your employee numbering</b><span>Keep the codes everyone already knows.</span></div>
+      <div class="chip"><b>Your companies and sites</b><span>One group, several companies, many depots.</span></div>
+      <div class="chip"><b>Your country's labour law</b><span>Leave, contracts and reports adapted to where you operate.</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="band" aria-labelledby="h-h">
+  <div class="wrap">
+    <p class="eyebrow">How it works</p>
+    <h2 id="h-h" style="margin:14px 0 44px">From first call to live system.</h2>
+    <div class="steps">
+      <div class="step"><p class="eyebrow">Step 1</p><h3>30-minute demo</h3><p>See the system running on real-world data and ask anything. No obligation.</p></div>
+      <div class="step"><p class="eyebrow">Step 2</p><h3>Set-up</h3><p>We load your employees, templates and rules, and brand the system as yours.</p></div>
+      <div class="step"><p class="eyebrow">Step 3</p><h3>Training</h3><p>Hands-on training for your HR team, plus a written guide to keep.</p></div>
+      <div class="step"><p class="eyebrow">Step 4</p><h3>Ongoing support</h3><p>Fixes, updates and help when you need it, included every month.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="pricing" aria-labelledby="pr-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><p class="eyebrow">Pricing</p><h2 id="pr-h" style="margin-top:14px">One flat monthly fee. No per&#8209;user charges.</h2></div>
+      <div>
+        <p>Priced by headcount, month to month. Add as many HR users as you need.</p>
+        <div class="toggle" role="group" aria-label="Currency">
+          <button type="button" id="cur-nad" aria-pressed="true" data-cur="nad">N$ Namibia</button>
+          <button type="button" id="cur-usd" aria-pressed="false" data-cur="usd">US$ International</button>
+        </div>
+      </div>
+    </div>
+    <div class="plans">
+      <div class="plan">
+        <p class="who">Up to 25 employees</p>
+        <p class="price" data-nad="N$3,000" data-usd="US$199">N$3,000<small> /month</small></p>
+        <ul><li>All HR modules</li><li>Unlimited HR users</li><li>Your branding</li><li>Support and updates</li></ul>
+        <a class="btn ghost" href="#demo">Book a demo</a>
+      </div>
+      <div class="plan pick">
+        <p class="who">26 to 50 employees</p>
+        <p class="price" data-nad="N$4,000" data-usd="US$269">N$4,000<small> /month</small></p>
+        <ul><li>All HR modules</li><li>Unlimited HR users</li><li>Several companies or sites</li><li>Support and updates</li></ul>
+        <a class="btn" href="#demo">Book a demo</a>
+      </div>
+      <div class="plan">
+        <p class="who">51+ employees or groups</p>
+        <p class="price">Quote<small> based on headcount</small></p>
+        <ul><li>Everything in the plans before</li><li>Multi-company groups</li><li>Custom reports</li><li>Tailored set-up</li></ul>
+        <a class="btn ghost" href="#demo">Ask for a quote</a>
+      </div>
+    </div>
+    <div class="setup"><span>Once-off set-up and training: <b id="setup-fee">N$8,000</b></span><span class="formnote">Includes loading your employees, your templates and rules, branding and team training.</span></div>
+  </div>
+</section>
+
+<section id="faq" aria-labelledby="q-h" style="padding-top:0">
+  <div class="wrap">
+    <p class="eyebrow">Questions</p>
+    <h2 id="q-h" style="margin:14px 0 36px">Straight answers.</h2>
+    <div class="faq">
+      <div>
+        <details><summary>Do our employees need phones or email?</summary><p>No. The system is run by your HR team. Employees keep using paper forms and signed timesheets, and the system turns them into records.</p></details>
+        <details><summary>Can AI change someone's pay by mistake?</summary><p>No. AI only makes a draft from the scanned timesheet. The employee checks a printout and signs it, and only that signed confirmation becomes final data.</p></details>
+        <details><summary>Can you load our existing records?</summary><p>Yes. Loading your current employees, leave balances and contract details from spreadsheets or exports is part of set-up.</p></details>
+      </div>
+      <div>
+        <details><summary>Does it work outside Namibia?</summary><p>Yes. Leave rules, contract wording and compliance reports are configured for your country during set-up, and the system works in your currency.</p></details>
+        <details><summary>Where is our data kept?</summary><p>In a secure cloud database that belongs to your company alone. Each client gets a separate system, and you can ask for a full export at any time.</p></details>
+        <details><summary>Are we locked into a contract?</summary><p>No. It runs month to month. If it stops earning its keep, you can stop.</p></details>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band contact" id="demo" aria-labelledby="d-h">
+  <div class="wrap">
+    <div>
+      <p class="eyebrow">Book a demo</p>
+      <h2 id="d-h" style="margin-top:14px">See it on a real HR day.</h2>
+      <p class="big">Thirty minutes, online or in person. Bring your messiest HR problem and we'll show you how the system handles it.</p>
+      <div class="direct">
+        <span>Email: <a href="mailto:owen@ogwconsult.com">owen@ogwconsult.com</a></span>
+        <span>WhatsApp: <a href="https://wa.me/264817354196">+264 81 735 4196</a></span>
+      </div>
+    </div>
+    <form id="demo-form" novalidate>
+      <div class="two">
+        <label for="f-name">Your name<input id="f-name" name="name" autocomplete="name" required></label>
+        <label for="f-company">Company<input id="f-company" name="company" autocomplete="organization" required></label>
+      </div>
+      <div class="two">
+        <label for="f-email">Work email<input id="f-email" name="email" type="email" autocomplete="email" required></label>
+        <label for="f-size">Employees
+          <select id="f-size" name="size"><option>Up to 25</option><option>26 to 50</option><option>51 to 200</option><option>200+</option></select>
+        </label>
+      </div>
+      <label for="f-country">Country<input id="f-country" name="country" autocomplete="country-name" placeholder="e.g. Namibia"></label>
+      <button class="btn" type="submit" style="justify-content:center">Request my demo</button>
+      <p class="formnote" id="f-note" aria-live="polite">This opens an email to us with your details filled in.</p>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap"><span>© 2026 OGW Consult · HR management systems</span><span>owen@ogwconsult.com</span></div>
+</footer>
+
+<script>
+(function(){
+  var btns=document.querySelectorAll('.toggle button');
+  var setup={nad:'N$8,000',usd:'US$599'};
+  function setCur(c){
+    btns.forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.cur===c));});
+    document.querySelectorAll('.price[data-nad]').forEach(function(p){
+      p.firstChild.nodeValue=p.dataset[c];
+    });
+    document.getElementById('setup-fee').textContent=setup[c];
+    try{localStorage.setItem('ogw-cur',c);}catch(e){}
+  }
+  btns.forEach(function(b){b.addEventListener('click',function(){setCur(b.dataset.cur);});});
+  try{var saved=localStorage.getItem('ogw-cur');if(saved)setCur(saved);}catch(e){}
+
+  var form=document.getElementById('demo-form'), note=document.getElementById('f-note');
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    var v=function(id){return document.getElementById(id).value.trim();};
+    if(!v('f-name')||!v('f-company')||!v('f-email')){
+      note.textContent='Please fill in your name, company and email.';note.removeAttribute('data-state');return;
+    }
+    var body='Name: '+v('f-name')+'\nCompany: '+v('f-company')+'\nEmail: '+v('f-email')+'\nEmployees: '+v('f-size')+'\nCountry: '+v('f-country');
+    var href='mailto:owen@ogwconsult.com?subject='+encodeURIComponent('Demo request: '+v('f-company'))+'&body='+encodeURIComponent(body);
+    window.location.href=href;
+    note.textContent='Your email app should open with the request ready to send. If it doesn\'t, email owen@ogwconsult.com.';
+    note.setAttribute('data-state','done');
+  });
+})();
+</script>
+</body>
+</html>
