@@ -206,7 +206,7 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
 <header class="hero" id="top">
   <div class="wrap">
     <div>
-      <p class="eyebrow">HR management system</p>
+      <p class="eyebrow">HR management system · set up for your country</p>
       <h1 style="margin-top:14px">HR for people who <span class="mark">don't sit at desks.</span></h1>
       <p class="lede">Leave, contracts, disciplinary records, compliance reports and paper timesheets in one system, set up around how your company already works. Your workers keep their pen and paper. Your HR team stops retyping it.</p>
       <div class="ctas">
@@ -408,7 +408,10 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
     try{localStorage.setItem('ogw-cur',c);}catch(e){}
   }
   btns.forEach(function(b){b.addEventListener('click',function(){setCur(b.dataset.cur);});});
-  try{var saved=localStorage.getItem('ogw-cur');if(saved)setCur(saved);}catch(e){}
+  var tz='';try{tz=Intl.DateTimeFormat().resolvedOptions().timeZone||'';}catch(e){}
+  var start=(tz==='Africa/Windhoek')?'nad':'usd';
+  try{var saved=localStorage.getItem('ogw-cur');if(saved)start=saved;}catch(e){}
+  setCur(start);
 
   var form=document.getElementById('demo-form'), note=document.getElementById('f-note');
   form.addEventListener('submit',function(e){
